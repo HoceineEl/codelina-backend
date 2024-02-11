@@ -17,15 +17,15 @@ class OptionResource extends Resource
 {
     protected static ?string $model = Option::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'fas-dot-circle';
+    protected static ?string $navigationGroup = 'Question Related';
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('question_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('question_id')
+                    ->relationship('question', 'content')
+                    ->required(),
                 Forms\Components\TextInput::make('content')
                     ->required()
                     ->maxLength(255),
@@ -38,21 +38,12 @@ class OptionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('question_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('question.content')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('content')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_correct')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

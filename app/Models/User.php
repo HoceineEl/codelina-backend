@@ -14,7 +14,9 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
+    const ROLES = ['admin', 'student'];
+    const ADMIN = 'admin';
+    const STUDENT = 'student';
     /**
      * The attributes that are mass assignable.
      *

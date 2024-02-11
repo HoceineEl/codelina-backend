@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id('id');
             $table->string('title');
             $table->longText('description');
-            $table->decimal('price', 10, 2);
+            $table->text('image')->nullable();
+            $table->text('intro')->nullable();
+            $table->decimal('price', 10, 2)->default(0);
+            $table->enum('level', ['beginner', 'intermediate', 'advanced']);
             $table->boolean('premium')->default(false);
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();

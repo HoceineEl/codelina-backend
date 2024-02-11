@@ -17,18 +17,17 @@ class QuestionResource extends Resource
 {
     protected static ?string $model = Question::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'fas-circle-question';
+    protected static ?string $navigationGroup = 'Question Related';
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('lesson_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('lesson_id')
+                    ->relationship('lesson', 'title')
+                    ->required(),
                 Forms\Components\Textarea::make('content')
                     ->required()
-                    ->maxLength(65535)
                     ->columnSpanFull(),
             ]);
     }
@@ -37,17 +36,9 @@ class QuestionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('lesson_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('lesson.title')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('content')
             ])
             ->filters([
                 //

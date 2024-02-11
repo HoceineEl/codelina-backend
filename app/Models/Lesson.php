@@ -11,12 +11,18 @@ use Illuminate\Database\Eloquent\Model;
 class Lesson extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'type', 'section_id'];
+    const TYPES = ['video', 'article', 'quiz'];
+    const VIDEO = 'video';
+    const ARTICLE = 'article';
+    const QUIZ = 'quiz';
+    protected $fillable = ['title', 'type', 'url', 'article', 'premium', 'order', 'section_id'];
 
     public function section()
     {
         return $this->belongsTo(Section::class);
     }
+
+
 
     public function progress()
     {

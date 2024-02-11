@@ -11,7 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'description', 'price', 'premium', 'created_by'];
+
+    const LEVELS = ['beginner', 'intermediate', 'advanced'];
+    const BIGINNER = 'beginner';
+    const INTERMEDIATE = 'intermediate';
+    const ADVANCED = 'advanced';
+
+    protected $fillable = ['title', 'description', 'price', 'level', 'image', 'intro', 'premium', 'created_by'];
 
     public function sections()
     {

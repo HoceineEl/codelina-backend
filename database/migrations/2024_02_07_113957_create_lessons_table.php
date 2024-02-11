@@ -16,6 +16,10 @@ return new class extends Migration
             $table->foreignId('section_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->enum('type', ['video', 'article', 'quiz']);
+            $table->integer('order');
+            $table->boolean('premium')->default(false);
+            $table->longText('article')->nullable();
+            $table->text('url')->nullable();
             $table->timestamps();
         });
     }

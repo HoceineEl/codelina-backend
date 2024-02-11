@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 class Question extends Model
 {
     use HasFactory;
-    protected $fillable = ['lesson_id', 'content'];
+    protected $fillable = ['lesson_id', 'order', 'content'];
 
     public function lesson()
     {

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('id');
             $table->foreignId('lesson_id')->constrained()->cascadeOnDelete();
             $table->text('content');
+            $table->integer('order');
             $table->timestamps();
         });
     }
