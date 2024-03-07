@@ -14,9 +14,9 @@ class Certification extends Model
     use HasFactory;
     protected $fillable = ['user_id', 'course_id'];
 
-    public function user(): BelongsTo
+    public function student(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function course(): BelongsTo

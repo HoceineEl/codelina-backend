@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Course;
 use App\Models\Tag;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class CourseSeeder extends Seeder
 {
@@ -23,15 +25,19 @@ class CourseSeeder extends Seeder
             'Android App Development', 'iOS Development'
         ];
 
-        // Create 20 courses with random titles
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 30; $i++) {
+            $title = fake()->sentence(6);
             $course =  Course::create([
-                'title' => $titles[$i],
+                'title' => $title,
+                'slug' => Str::slug($title),
                 'description' => fake()->text,
+                'old_price' => rand(50, 90),
                 'created_by' => 1,
+                'category_id' => rand(1, 3),
+                'price' => rand(0, 1) ? rand(10, 50) : '0',
                 'level' => Arr::random(Course::LEVELS),
                 'image' => 'courses/' . rand(1, 5) . '.webp',
-                'intro' => 'https://youtu.be/salY_Sm6mv4?si=KTDzG1z8oNRP9_Vb'
+                'intro' => '8kj9gY6kPfY'
             ]);
             $course->tags()->attach(Tag::take(rand(1, 5))->pluck('id'));
         }

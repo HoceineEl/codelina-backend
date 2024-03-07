@@ -19,7 +19,7 @@ class QuestionSeeder extends Seeder
             for ($i = 0; $i < rand(1, 3); $i++) {
                 Question::create([
                     'lesson_id' => $lesson->id,
-                    'order' => $lesson->questions->count() + 1,
+                    'order' => $i + 1,
                     'content' => fake()->sentence() . '?',
                 ]);
             }

@@ -22,9 +22,10 @@ class LessonSeeder extends Seeder
                 Lesson::create([
                     'title' => fake()->sentence(),
                     'type' => $type,
-                    'order' => $section->lessons->count() + 1,
-                    'url' => $type === Lesson::VIDEO ? 'https://www.youtube.com/watch?v=IKmlDnItT_A' : null,
-                    'article' => $type === Lesson::ARTICLE ?  fake()->text(800) : null,
+                    'order' => $i + 1,
+                    'video_id' => $type === Lesson::VIDEO ? 'IKmlDnItT_A' : null,
+                    'duration' => ($type === Lesson::VIDEO) ? 12 : (($type === Lesson::ARTICLE) ? 5 : 0),
+                    'article' => $type === Lesson::ARTICLE ?  fake()->paragraph(30) : null,
                     'section_id' => $section->id,
                 ]);
             }

@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id('id');
             $table->string('title');
+            $table->string('slug')->unique();
             $table->longText('description');
             $table->text('image')->nullable();
             $table->text('intro')->nullable();
             $table->decimal('price', 10, 2)->default(0);
+            $table->decimal('old_price', 10, 2)->default(0);
             $table->enum('level', ['beginner', 'intermediate', 'advanced']);
             $table->boolean('premium')->default(false);
+            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });

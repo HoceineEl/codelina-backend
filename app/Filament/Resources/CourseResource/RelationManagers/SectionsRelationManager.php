@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\CourseResource\RelationManagers;
 
+use Alaouy\Youtube\Facades\Youtube;
 use App\Models\Course;
 use App\Models\Lesson;
+use DateInterval;
 use Filament\Forms;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -14,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -36,11 +40,11 @@ class SectionsRelationManager extends RelationManager
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('description'),
                                 Forms\Components\TextInput::make('order')
+                                    ->disabled()
                                     ->default($this->ownerRecord->sections->count() + 1),
                             ]),
                         Tabs\Tab::make('Lessons')
                             ->schema([
-
                                 Repeater::make('lessons')
                                     ->relationship()
                                     ->schema([
@@ -53,6 +57,7 @@ class SectionsRelationManager extends RelationManager
                                                     ->inline(false),
 
                                             ])->columns(3),
+
                                         Select::make('type')
                                             ->options([
                                                 'video' => 'Video',
@@ -61,20 +66,36 @@ class SectionsRelationManager extends RelationManager
                                             ])
                                             ->live()
                                             ->default('video'),
-                                        TextInput::make('url')
-                                            ->label('Video URL')
-                                            ->hidden(function (Get $get) {
-                                                return $get('type') !== Lesson::VIDEO;
-                                            }),
-                                        // Forms\Components\TextInput::make('order')
-                                        //     ->default(function () {
-                                        //         return $this->ownerRecord->lessons->count() + 1;
-                                        //     }),
-                                        RichEditor::make('article')
+                                        TextInput::make('video_id')
+                                            ->label('Video ID')
+                                            ->hidden(
+                                                fn (Get $get) => $get('type') !== Lesson::VIDEO
+                                            )
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                $video = Youtube::getVideoInfo($get('video_id'));
+                                                $duration = 0;
+                                                $duration = $this->getMinutes($video->contentDetails->duration);
+
+                                                $set('duration', $duration);
+                                            })
+                                            ->live(),
+                                        TextInput::make('duration')
+                                            ->label('Lesson duration')
+                                            ->readOnly()
+                                            ->default(0)
+                                            ->hidden(
+                                                fn (Get $get) => $get('type') == Lesson::QUIZ
+                                            ),
+                                        MarkdownEditor::make('article')
                                             ->label('Article Content')
-                                            ->hidden(function (Get $get) {
-                                                return $get('type') !== Lesson::ARTICLE;
-                                            })->columnSpanFull(),
+                                            ->hidden(fn (Get $get) => $get('type') !== Lesson::ARTICLE)
+                                            ->live()
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                $words = str_word_count($get('video_id'));
+                                                $duration = round($words / 200, 2);
+                                                $set('duration', $duration);
+                                            })
+                                            ->columnSpanFull(),
                                         Repeater::make('questions')
                                             ->relationship()
                                             ->schema([
@@ -93,18 +114,18 @@ class SectionsRelationManager extends RelationManager
                                                     ->collapsible()
                                                     ->collapsed()
                                                     ->reorderable()
-                                                    ->itemLabel(fn (array $state): ?string => $state['content'] ?? null),
+                                                    ->itemLabel(fn (array $state): ?string => $state['content'] . ($state['is_correct'] ? 'Correct' : '') ?? null),
                                             ])
                                             ->columnSpanFull()
                                             ->collapsible()
                                             ->collapsed()
                                             ->reorderable()
-                                            ->itemLabel(fn (array $state): ?string => $state['content'] ?? null)
+                                            ->itemLabel(fn (array $state): ?string => $state['content']  ?? null)
                                             ->hidden(function (Get $get) {
                                                 return $get('type') !== Lesson::QUIZ;
                                             }),
                                     ])
-                                    ->columns(2)->defaultItems(1)
+                                    ->columns(2)
                                     ->orderColumn('order')
                                     ->collapsible()
                                     ->collapsed()
@@ -141,5 +162,21 @@ class SectionsRelationManager extends RelationManager
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+    public function getMinutes($duration)
+    {
+
+        // Parse the duration string
+        preg_match('/PT(\d+H)?(\d+M)?(\d+S)?/', $duration, $matches);
+
+        // Extract hours, minutes, and seconds
+        $hours = isset($matches[1]) ? intval(str_replace('H', '', $matches[1])) : 0;
+        $minutes = isset($matches[2]) ? intval(str_replace('M', '', $matches[2])) : 0;
+        $seconds = isset($matches[3]) ? intval(str_replace('S', '', $matches[3])) : 0;
+
+        // Calculate the total duration in minutes
+        $totalMinutes = $hours * 60 + $minutes + round($seconds / 60);
+
+        return $totalMinutes;
     }
 }

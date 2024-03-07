@@ -3,14 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CourseResource\Pages;
-use App\Filament\Resources\CourseResource\RelationManagers;
 use App\Filament\Resources\CourseResource\RelationManagers\SectionsRelationManager;
 use App\Models\Course;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
@@ -18,9 +21,8 @@ use Filament\Tables;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class CourseResource extends Resource
 {
@@ -40,12 +42,23 @@ class CourseResource extends Resource
                         ->relationship('creator', 'name')
                         ->default(auth()->id())
                         ->required(),
-                    Forms\Components\TextInput::make('title')
-                        ->required()
-                        ->maxLength(255),
+                    Section::make('Title')
+                        ->schema([
+                            Forms\Components\TextInput::make('title')
+                                ->required()
+                                ->live()
+                                ->afterStateUpdated(fn (Get $get, Set $set) => $set('slug', Str::slug($get('title')))),
+                            TextInput::make('slug')
+                                ->required()
+                                ->disabled(),
+                        ]),
                     Forms\Components\MarkdownEditor::make('description')
                         ->required()
                         ->columnSpanFull(),
+                    Select::make('category_id')
+                        ->label('Category')
+                        ->relationship('category', 'name')
+                        ->preload(),
                     Select::make('tags')
                         ->relationship('tags', 'name')
                         ->multiple()
@@ -54,6 +67,11 @@ class CourseResource extends Resource
                 ]),
                 Group::make([
                     Forms\Components\TextInput::make('price')
+                        ->required()
+                        ->numeric()
+                        ->default(0)
+                        ->prefix('$'),
+                    Forms\Components\TextInput::make('old_price')
                         ->required()
                         ->numeric()
                         ->default(0)
@@ -92,9 +110,15 @@ class CourseResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('lessonsNumber'),
+
                 Tables\Columns\TextColumn::make('price')
                     ->money()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('old_price')
+                    ->money()
+                    ->sortable(),
+                TextColumn::make('category.name'),
                 Tables\Columns\TextColumn::make('level')
                     ->sortable()
                     ->badge()
@@ -105,7 +129,6 @@ class CourseResource extends Resource
                     })
                     ->searchable(),
                 TextColumn::make('tags.name')
-                    ->label('Addons')
                     ->badge()
 
                     ->weight(FontWeight::Light)

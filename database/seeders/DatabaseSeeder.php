@@ -12,7 +12,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
 
         \App\Models\User::factory()->create([
             'name' => 'Hoceine EL IDRISSI',
@@ -21,13 +20,19 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
             'avatar' => 'https://avatars.githubusercontent.com/u/108903912?v=4'
         ]);
+        \App\Models\User::factory(80)->create();
+
         $this->call([
             TagSeeder::class,
+            CategorySeeder::class,
             CourseSeeder::class,
             SectionSeeder::class,
             LessonSeeder::class,
             QuestionSeeder::class,
             OptionSeeder::class,
+            PaymentSeeder::class,
+            CertificationSeeder::class,
+            FeedbackSeeder::class,
         ]);
     }
 }

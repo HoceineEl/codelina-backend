@@ -15,11 +15,11 @@ class SectionSeeder extends Seeder
     public function run(): void
     {
         $courses = Course::get();
-        foreach ($courses as $key => $course) {
+        foreach ($courses as  $course) {
             for ($i = 0; $i < rand(1, 8); $i++) {
                 Section::create([
                     'title' => fake()->sentence(),
-                    'order' => $course->sections->count() + 1,
+                    'order' => $i + 1,
                     'course_id' => $course->id,
                     'description' => rand(0, 1) ? '' : fake()->text(),
                 ]);

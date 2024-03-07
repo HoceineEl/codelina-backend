@@ -25,7 +25,7 @@ class CertificationResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'id')
+                    ->relationship('student', 'name')
                     ->required(),
                 Forms\Components\Select::make('course_id')
                     ->relationship('course', 'title')
@@ -37,10 +37,11 @@ class CertificationResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('student.name')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('course.title')
+                    ->searchable()
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')

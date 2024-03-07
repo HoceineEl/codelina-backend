@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Alaouy\Youtube\Facades\Youtube;
+use DateInterval;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
